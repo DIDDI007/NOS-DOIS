@@ -3,20 +3,21 @@
   "name": "Nós Dois",
   "short_name": "Nós Dois",
   "description": "Refúgio Afetivo Particular",
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#DBCFCA",
   "theme_color": "#DBCFCA",
   "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon.png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

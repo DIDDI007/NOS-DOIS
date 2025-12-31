@@ -1,12 +1,11 @@
 
-const CACHE_NAME = 'nos-dois-v3-final';
+const CACHE_NAME = 'nos-dois-v4-full';
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon.png',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon.png',
+  'https://cdn.tailwindcss.com'
 ];
 
 self.addEventListener('install', (event) => {
