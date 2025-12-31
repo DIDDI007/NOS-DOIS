@@ -1,15 +1,14 @@
 {
-  "name": "Nós Dois - Refúgio Afetivo",
+  "name": "Nós Dois",
   "short_name": "Nós Dois",
-  "id": "com.nosdois.app.v1",
-  "description": "Um refúgio minimalista para casais manterem a conexão emocional mesmo à distância.",
-  "start_url": "index.html?source=pwa",
+  "id": "com.nosdois.afetivo.v1",
+  "description": "Um refúgio minimalista para casais manterem a conexão.",
+  "start_url": "./index.html?source=pwa",
   "display": "standalone",
-  "background_color": "#DBCFCA",
-  "theme_color": "#DBCFCA",
+  "background_color": "#FDF6EC",
+  "theme_color": "#C49595",
   "orientation": "portrait",
-  "scope": ".",
-  "categories": ["lifestyle", "social"],
+  "scope": "./",
   "icons": [
     {
       "src": "icon.png",

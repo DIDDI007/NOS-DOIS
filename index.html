@@ -6,12 +6,13 @@
     <title>Nós Dois</title>
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#DBCFCA">
+    <meta name="theme-color" content="#FDF6EC">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Nós Dois">
     
+    <!-- Ícones e Manifesto -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -20,7 +21,7 @@
       #pwa-splash {
         position: fixed;
         inset: 0;
-        background: #DBCFCA;
+        background: #FDF6EC;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -29,24 +30,24 @@
         transition: opacity 0.6s ease-out;
       }
       #pwa-splash img { 
-        width: 100px; 
-        height: 100px; 
-        border-radius: 30px; 
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
+        width: 120px; 
+        height: 120px; 
+        border-radius: 40px; 
+        box-shadow: 0 15px 35px rgba(196, 149, 149, 0.2);
+        margin-bottom: 24px;
       }
       .loading-bar {
-        width: 120px;
-        height: 2px;
-        background: rgba(255,255,255,0.3);
+        width: 140px;
+        height: 3px;
+        background: rgba(196, 149, 149, 0.1);
         border-radius: 10px;
         overflow: hidden;
       }
       .loading-progress {
         width: 40%;
         height: 100%;
-        background: #A17A74;
-        animation: loading 2s infinite ease-in-out;
+        background: #C49595;
+        animation: loading 1.5s infinite ease-in-out;
       }
       @keyframes loading {
         0% { transform: translateX(-100%); }
@@ -74,7 +75,7 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        :root { --app-bg: #DBCFCA; --app-text: #3D3434; }
+        :root { --app-bg: #FDF6EC; --app-text: #3D3434; }
         .dark { --app-bg: #1A1818; --app-text: #E0D7D7; }
 
         body {
@@ -115,7 +116,7 @@
 </head>
 <body>
     <div id="pwa-splash">
-      <img src="icon.png" alt="Logo" onerror="this.style.display='none'">
+      <img src="icon.png" alt="Nós Dois" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=ND&backgroundColor=C49595'">
       <div class="loading-bar"><div class="loading-progress"></div></div>
     </div>
     <div id="root"></div>
@@ -125,7 +126,7 @@
         setTimeout(() => {
           const splash = document.getElementById('pwa-splash');
           if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 600); }
-        }, 1500);
+        }, 1200);
       });
     </script>
 </body>

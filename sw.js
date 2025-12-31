@@ -1,14 +1,15 @@
-const CACHE_NAME = 'nos-dois-v10';
+const CACHE_NAME = 'nos-dois-v11-icon';
 const ASSETS_TO_CACHE = [
-  'index.html',
-  'manifest.json',
-  'icon.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon.png'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Cache v10 instalado');
+      console.log('Cache v11 instalado');
       return cache.addAll(ASSETS_TO_CACHE);
     }).catch(err => console.error("Erro no cache install:", err))
   );
@@ -37,18 +38,15 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        // Não faz cache de chamadas externas sensíveis (Firebase, Gemini)
         if (!event.request.url.startsWith(self.location.origin)) return networkResponse;
         
         return caches.open(CACHE_NAME).then((cache) => {
-          // Apenas cacheia se for sucesso
           if (networkResponse.status === 200) {
             cache.put(event.request, networkResponse.clone());
           }
           return networkResponse;
         });
       }).catch(() => {
-        // Fallback offline para navegação
         if (event.request.mode === 'navigate') {
           return caches.match('index.html');
         }
