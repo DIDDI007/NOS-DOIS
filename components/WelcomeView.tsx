@@ -12,7 +12,6 @@ const WelcomeView: React.FC<Props> = ({ onStart }) => {
   return (
     <div className="flex flex-col items-center justify-center text-center h-full min-h-[80vh] animate-in fade-in duration-1000 px-6">
       <div className="relative mb-12 flex items-center justify-center">
-        {/* Efeito de brilho atrás do ícone */}
         <div className="absolute inset-0 bg-white/40 blur-3xl rounded-full scale-150 animate-pulse"></div>
         
         <div className="relative w-40 h-40 flex items-center justify-center">
@@ -24,14 +23,9 @@ const WelcomeView: React.FC<Props> = ({ onStart }) => {
               onError={() => setImageError(true)}
               className={`w-32 h-32 rounded-full shadow-2xl border-4 border-white/60 object-cover z-10 transition-all duration-1000 ${imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
             />
-          ) : null}
-
-          {/* Fallback caso a imagem demore ou falhe: Um coração elegante em CSS */}
-          {(!imageLoaded || imageError) && (
-            <div className="absolute inset-0 flex items-center justify-center z-0">
-               <div className="w-24 h-24 bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center animate-pulse-soft border-2 border-white/60">
-                  <span className="text-5xl">❤️</span>
-               </div>
+          ) : (
+            <div className="w-32 h-32 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center shadow-2xl border-4 border-white/60 z-10">
+              <span className="text-6xl drop-shadow-md">❤️</span>
             </div>
           )}
         </div>
