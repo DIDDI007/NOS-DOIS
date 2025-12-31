@@ -1,31 +1,41 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-// Registro Robusto do Service Worker
+// Log de versão para debug no console do navegador
+console.log("Versão PWA: 1.0.7 - Ready for Install");
+
+// Registro do Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(registration => {
-        console.log('SW registrado:', registration.scope);
+        console.log('SW registrado com sucesso:', registration.scope);
       })
       .catch(err => {
-        console.warn('Erro ao registrar SW:', err);
+        console.error('Falha ao registrar SW:', err);
       });
   });
 }
 
-// Captura do evento de instalação para o Chrome
+// Lógica de Instalação PWA
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Impede que o mini-infobar apareça no mobile
+  console.log('Evento beforeinstallprompt disparado!');
+  // Impede que o navegador mostre o prompt automático
   e.preventDefault();
-  // Guarda o evento para ser usado depois
+  // Armazena o evento globalmente para uso posterior
   window.deferredPrompt = e;
-  // Dispara um evento customizado para o React saber que pode instalar
-  window.dispatchEvent(new Event('can-install-pwa'));
+  // Notifica o app que a instalação está disponível
+  window.dispatchEvent(new CustomEvent('pwa-installable', { detail: true }));
 });
 
-// Interface global para o TypeScript não reclamar
+window.addEventListener('appinstalled', (evt) => {
+  console.log('App instalado com sucesso!');
+  window.deferredPrompt = null;
+  window.dispatchEvent(new CustomEvent('pwa-installable', { detail: false }));
+});
+
 declare global {
   interface Window {
     deferredPrompt: any;

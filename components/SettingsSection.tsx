@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppSettings } from '../types';
 
@@ -32,10 +33,21 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
   const [canInstall, setCanInstall] = useState(!!window.deferredPrompt);
 
   useEffect(() => {
-    const handleCanInstall = () => setCanInstall(true);
-    window.addEventListener('can-install-pwa', handleCanInstall);
-    return () => window.removeEventListener('can-install-pwa', handleCanInstall);
-  }, []);
+    const handleInstallable = (e: any) => {
+      setCanInstall(e.detail);
+    };
+    window.addEventListener('pwa-installable', handleInstallable);
+    
+    // Verificação secundária
+    const interval = setInterval(() => {
+      if (window.deferredPrompt && !canInstall) setCanInstall(true);
+    }, 2000);
+
+    return () => {
+      window.removeEventListener('pwa-installable', handleInstallable);
+      clearInterval(interval);
+    };
+  }, [canInstall]);
 
   const handleInstallClick = async () => {
     const promptEvent = window.deferredPrompt;
@@ -43,11 +55,13 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
     
     promptEvent.prompt();
     const { outcome } = await promptEvent.userChoice;
-    console.log(`Usuário escolheu: ${outcome}`);
+    console.log(`Resultado da instalação: ${outcome}`);
     
     window.deferredPrompt = null;
     setCanInstall(false);
   };
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
 
   return (
     <div className="flex flex-col h-full animate-in slide-in-from-right-6 duration-500 overflow-y-auto pb-10 pr-1 scrollbar-hide">
@@ -61,7 +75,7 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
 
       <div className="space-y-10">
         {/* Bloco de Instalação PWA */}
-        {canInstall && (
+        {canInstall && !isStandalone && (
           <div className="space-y-4 animate-in fade-in zoom-in duration-700">
             <label className="block text-[11px] uppercase tracking-[0.3em] px-6 font-black text-[#A17A74] dark:text-[#D4A5A5]">
               Aplicativo
@@ -76,11 +90,19 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
                 </div>
                 <div className="text-left">
                   <span className="text-sm font-black block">Instalar no Celular</span>
-                  <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Melhor experiência</span>
+                  <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Acesso rápido e offline</span>
                 </div>
               </div>
               <span className="font-black text-xl">→</span>
             </button>
+          </div>
+        )}
+
+        {isStandalone && (
+          <div className="px-6 py-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-3xl">
+            <p className="text-[10px] text-green-700 dark:text-green-400 font-black uppercase tracking-widest text-center">
+              ✓ Aplicativo Instalado
+            </p>
           </div>
         )}
 
