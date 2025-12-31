@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppSettings } from '../types';
 
 interface Props {
@@ -30,6 +29,26 @@ const CalendarIcon = () => (
 );
 
 const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, onUpdate, onClear, onBack, onOpenTrash, onOpenHistory }) => {
+  const [canInstall, setCanInstall] = useState(!!window.deferredPrompt);
+
+  useEffect(() => {
+    const handleCanInstall = () => setCanInstall(true);
+    window.addEventListener('can-install-pwa', handleCanInstall);
+    return () => window.removeEventListener('can-install-pwa', handleCanInstall);
+  }, []);
+
+  const handleInstallClick = async () => {
+    const promptEvent = window.deferredPrompt;
+    if (!promptEvent) return;
+    
+    promptEvent.prompt();
+    const { outcome } = await promptEvent.userChoice;
+    console.log(`Usuário escolheu: ${outcome}`);
+    
+    window.deferredPrompt = null;
+    setCanInstall(false);
+  };
+
   return (
     <div className="flex flex-col h-full animate-in slide-in-from-right-6 duration-500 overflow-y-auto pb-10 pr-1 scrollbar-hide">
       <header className="flex justify-between items-center mb-10 flex-shrink-0">
@@ -41,6 +60,30 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
       </header>
 
       <div className="space-y-10">
+        {/* Bloco de Instalação PWA */}
+        {canInstall && (
+          <div className="space-y-4 animate-in fade-in zoom-in duration-700">
+            <label className="block text-[11px] uppercase tracking-[0.3em] px-6 font-black text-[#A17A74] dark:text-[#D4A5A5]">
+              Aplicativo
+            </label>
+            <button 
+              onClick={handleInstallClick}
+              className="w-full flex items-center justify-between p-6 bg-[#A17A74] text-white rounded-[2.5rem] shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              <div className="flex items-center gap-5">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <span className="text-xl">📲</span>
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-black block">Instalar no Celular</span>
+                  <span className="text-[9px] uppercase tracking-widest font-black opacity-80">Melhor experiência</span>
+                </div>
+              </div>
+              <span className="font-black text-xl">→</span>
+            </button>
+          </div>
+        )}
+
         <div className="space-y-4">
           <label className="block text-[11px] uppercase tracking-[0.3em] px-6 font-black text-[#A17A74] dark:text-[#D4A5A5]">
             Ambiente e Luz
