@@ -7,6 +7,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    chunkSizeWarningLimit: 2000, // Ajuste solicitado para silenciar avisos de tamanho
     rollupOptions: {
       input: {
         main: './index.html',
