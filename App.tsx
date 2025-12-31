@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AppState, AppView, EmotionType, ChatEntry, Photo } from './types';
 import { EMOTIONS } from './constants';
@@ -31,8 +30,11 @@ import {
 } from './firebase';
 
 const LOCAL_STORAGE_KEY = 'nos_dois_v3_couple_id';
+const APP_VERSION = '1.0.6'; // Log para confirmar atualização
 
 const App: React.FC = () => {
+  console.log(`Nos Dois v${APP_VERSION} inicializando...`);
+  
   const [hasStarted, setHasStarted] = useState(false);
   const [resumedChat, setResumedChat] = useState<ChatEntry | null>(null);
   const [resumedEmotion, setResumedEmotion] = useState<string | null>(null);
@@ -72,17 +74,16 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!state.coupleId) return;
 
-    // Conexão Segura
     const connectToFirebase = async () => {
       try {
-        await signInAnonymously(auth);
-        console.log("Conectado ao Firebase com Sucesso");
+        const userCredential = await signInAnonymously(auth);
+        console.log("Autenticado anonimamente:", userCredential.user.uid);
 
-        // Verifica se o casal já existe, se não, inicializa
         const coupleRef = doc(db, "couples", state.coupleId);
         const coupleSnap = await getDoc(coupleRef);
         
         if (!coupleSnap.exists()) {
+          console.log("Criando novo registro de casal...");
           await setDoc(coupleRef, { settings: state.settings, created: Date.now() });
         }
 
@@ -110,7 +111,7 @@ const App: React.FC = () => {
 
         return () => unsubs.forEach(unsub => unsub());
       } catch (err) {
-        console.error("Erro Crítico:", err);
+        console.error("Erro na conexão Firebase:", err);
       }
     };
 

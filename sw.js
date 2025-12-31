@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nos-dois-v5';
+const CACHE_NAME = 'nos-dois-v6';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -16,7 +16,12 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => Promise.all(
-      keys.map((key) => { if (key !== CACHE_NAME) return caches.delete(key); })
+      keys.map((key) => { 
+        if (key !== CACHE_NAME) {
+          console.log('Removendo cache antigo:', key);
+          return caches.delete(key); 
+        }
+      })
     ))
   );
   self.clients.claim();
