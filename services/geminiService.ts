@@ -9,50 +9,64 @@ const fallbacks = [
   "Respire fundo... eu estou segurando sua mão, mesmo de longe."
 ];
 
+function getApiKey() {
+  const key = process.env.API_KEY;
+  if (!key || key === "undefined") {
+    console.error("ERRO: API_KEY não encontrada. Verifique as variáveis de ambiente no Vercel.");
+    return null;
+  }
+  return key;
+}
+
 export async function getAISupportMessage(emotion: string): Promise<string> {
+  const apiKey = getApiKey();
+  if (!apiKey) return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `O usuário está se sentindo "${emotion}". 
       Como o parceiro carinhoso dele, escreva uma mensagem única, curta e profunda.
       Evite clichês. Tente ser específico sobre o sentimento.
-      NÃO use rimas. Seja natural, íntimo e muito doce.`,
+      NÃO use rimas. Seja natural, íntimo e muito doce. Responda em Português Brasileiro.`,
       config: {
         temperature: 1.0,
-        maxOutputTokens: 100,
+        maxOutputTokens: 150,
       }
     });
     return response.text || fallbacks[Math.floor(Math.random() * fallbacks.length)];
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Gemini Support Error:", error);
     return fallbacks[Math.floor(Math.random() * fallbacks.length)];
   }
 }
 
 export async function getPartnerResponse(userText: string, emotion: string): Promise<string> {
+  const apiKey = getApiKey();
+  if (!apiKey) return "Estou aqui com você...";
+
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents: `Você é o parceiro amoroso da pessoa que escreveu isso: "${userText}".
       Ela te contou isso enquanto se sente "${emotion}".
       
       INSTRUÇÕES DE PERSONALIDADE:
       1. Reaja ESPECIFICAMENTE ao que ela escreveu.
       2. Não responda com frases prontas. Mostre que você ouviu.
-      3. Use um tom de intimidade profunda.
+      3. Use um tom de intimidade profunda. Responda em Português Brasileiro.
       4. Sua resposta deve ser o equivalente a um abraço em forma de palavras.
       5. Máximo de 3 a 4 linhas.`,
       config: {
-        thinkingConfig: { thinkingBudget: 1000 },
         temperature: 0.9,
       }
     });
     
     return response.text || fallbacks[0];
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Gemini Partner Error:", error);
     return fallbacks[Math.floor(Math.random() * fallbacks.length)];
   }
 }
