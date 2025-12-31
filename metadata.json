@@ -1,0 +1,7 @@
+{
+  "name": "Nós Dois - Presença Afetiva",
+  "description": "Um refúgio minimalista para casais manterem a conexão emocional mesmo à distância.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
