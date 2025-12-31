@@ -1,9 +1,20 @@
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { initializeApp } from "firebase/app";
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  onSnapshot, 
+  collection, 
+  query, 
+  orderBy, 
+  deleteDoc, 
+  writeBatch,
+  getDocs,
+  getDoc
+} from "firebase/firestore";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
-// Suas credenciais reais integradas
 const firebaseConfig = {
   apiKey: "AIzaSyAyJFZbwsXXDjuDpDhhjZjLimCZztVe0Ps",
   authDomain: "nosdois-presencaafetiva.firebaseapp.com",
@@ -15,6 +26,23 @@ const firebaseConfig = {
   measurementId: "G-X0RQXBYKCN"
 };
 
+// Inicializa o app apenas se não houver um já inicializado (evita erro de re-init)
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+export { 
+  db, 
+  auth, 
+  signInAnonymously,
+  doc, 
+  setDoc, 
+  onSnapshot, 
+  collection, 
+  query, 
+  orderBy, 
+  deleteDoc, 
+  writeBatch,
+  getDocs,
+  getDoc
+};

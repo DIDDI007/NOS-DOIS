@@ -15,19 +15,20 @@ import HistorySection from './components/HistorySection';
 import ConversationHistorySection from './components/ConversationHistorySection';
 import DiarySection from './components/DiarySection';
 
-import { db, auth } from './firebase';
 import { 
+  db, 
+  auth, 
+  signInAnonymously,
   doc, 
   setDoc, 
+  getDoc,
   onSnapshot, 
   collection, 
   query, 
   orderBy, 
   deleteDoc, 
-  writeBatch,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  writeBatch
+} from './firebase';
 
 const LOCAL_STORAGE_KEY = 'nos_dois_v3_couple_id';
 
@@ -71,31 +72,49 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!state.coupleId) return;
 
-    signInAnonymously(auth).then(() => {
-      const listenCollection = (name: string, setter: (data: any[]) => void) => {
-        const q = query(collection(db, "couples", state.coupleId, name), orderBy("timestamp", "desc"));
-        return onSnapshot(q, (snapshot) => {
-          const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setter(items);
-        });
-      };
+    // Conexão Segura
+    const connectToFirebase = async () => {
+      try {
+        await signInAnonymously(auth);
+        console.log("Conectado ao Firebase com Sucesso");
 
-      const unsubs = [
-        listenCollection("diary", (data) => setState(p => ({ ...p, diary: data }))),
-        listenCollection("photos", (data) => setState(p => ({ ...p, photos: data }))),
-        listenCollection("chats", (data) => setState(p => ({ ...p, chats: data }))),
-        listenCollection("favorites", (data) => setState(p => ({ ...p, favorites: data }))),
-        listenCollection("trash", (data) => setState(p => ({ ...p, trash: data }))),
-        listenCollection("history", (data) => setState(p => ({ ...p, history: data }))),
-        onSnapshot(doc(db, "couples", state.coupleId), (doc) => {
-          if (doc.exists() && doc.data().settings) {
-            setState(prev => ({ ...prev, settings: { ...prev.settings, ...doc.data().settings } }));
-          }
-        })
-      ];
+        // Verifica se o casal já existe, se não, inicializa
+        const coupleRef = doc(db, "couples", state.coupleId);
+        const coupleSnap = await getDoc(coupleRef);
+        
+        if (!coupleSnap.exists()) {
+          await setDoc(coupleRef, { settings: state.settings, created: Date.now() });
+        }
 
-      return () => unsubs.forEach(unsub => unsub());
-    }).catch(err => console.error("Firebase Auth Error", err));
+        const listenCollection = (name: string, setter: (data: any[]) => void) => {
+          const q = query(collection(db, "couples", state.coupleId, name), orderBy("timestamp", "desc"));
+          return onSnapshot(q, (snapshot) => {
+            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setter(items);
+          }, (err) => console.error(`Erro na coleção ${name}:`, err));
+        };
+
+        const unsubs = [
+          listenCollection("diary", (data) => setState(p => ({ ...p, diary: data }))),
+          listenCollection("photos", (data) => setState(p => ({ ...p, photos: data }))),
+          listenCollection("chats", (data) => setState(p => ({ ...p, chats: data }))),
+          listenCollection("favorites", (data) => setState(p => ({ ...p, favorites: data }))),
+          listenCollection("trash", (data) => setState(p => ({ ...p, trash: data }))),
+          listenCollection("history", (data) => setState(p => ({ ...p, history: data }))),
+          onSnapshot(coupleRef, (doc) => {
+            if (doc.exists() && doc.data().settings) {
+              setState(prev => ({ ...prev, settings: { ...prev.settings, ...doc.data().settings } }));
+            }
+          })
+        ];
+
+        return () => unsubs.forEach(unsub => unsub());
+      } catch (err) {
+        console.error("Erro Crítico:", err);
+      }
+    };
+
+    connectToFirebase();
   }, [state.coupleId]);
 
   const navigateTo = (view: AppView, origin?: AppView) => {
@@ -116,7 +135,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Funções de Lixeira
   const moveToTrash = async (photo: Photo) => {
     if (!state.coupleId) return;
     const batch = writeBatch(db);
@@ -151,21 +169,17 @@ const App: React.FC = () => {
 
   if (!hasStarted) return <WelcomeView onStart={() => setHasStarted(true)} />;
   if (!state.coupleId) return <PairingView onConnect={(code) => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, code.toLowerCase());
-    setState(p => ({ ...p, coupleId: code.toLowerCase() }));
+    const cleanCode = code.toLowerCase().trim();
+    localStorage.setItem(LOCAL_STORAGE_KEY, cleanCode);
+    setState(p => ({ ...p, coupleId: cleanCode }));
   }} />;
 
-  // Proteção contra brilho zero (mínimo de 20% efetivo)
   const safeBrightness = Math.max(20, state.settings?.brightness || 100);
   const brightnessOpacity = (100 - safeBrightness) / 100 * 0.85;
 
   return (
     <>
-      <div 
-        className="brightness-overlay" 
-        style={{ opacity: brightnessOpacity }}
-      ></div>
-      
+      <div className="brightness-overlay" style={{ opacity: brightnessOpacity }}></div>
       <main className="w-full max-w-md mx-auto flex flex-col p-6 overflow-x-hidden min-h-screen">
         {state.currentView === 'hub' && <MainHub onNavigate={(v) => navigateTo(v, 'hub')} hasNotification={state.newPhotoNotification} photos={state.photos} />}
         {state.currentView === 'gallery' && <GallerySection photos={state.photos} onAddPhoto={(p) => setDoc(doc(db, "couples", state.coupleId, "photos", p.id), p)} onRemovePhoto={moveToTrash} onBack={() => navigateTo('hub')} onOpenTrash={() => navigateTo('trash')} />}
