@@ -1,14 +1,14 @@
 {
   "name": "Nós Dois",
   "short_name": "Nós Dois",
-  "description": "Refúgio Afetivo Particular para casais à distância.",
+  "description": "Refúgio Afetivo Particular para casais que buscam conexão profunda.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#DBCFCA",
   "theme_color": "#DBCFCA",
   "orientation": "portrait",
   "scope": "/",
-  "categories": ["lifestyle", "social"],
+  "categories": ["lifestyle", "social", "productivity"],
   "icons": [
     {
       "src": "/icon.png",
@@ -21,6 +21,15 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tela Inicial do Refúgio"
     }
   ]
 }
