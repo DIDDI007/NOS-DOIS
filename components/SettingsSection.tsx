@@ -31,6 +31,8 @@ const CalendarIcon = () => (
 
 const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, onUpdate, onClear, onBack, onOpenTrash, onOpenHistory }) => {
   const [canInstall, setCanInstall] = useState(!!window.deferredPrompt);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
 
   useEffect(() => {
     const handleInstallable = (e: any) => {
@@ -38,7 +40,6 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
     };
     window.addEventListener('pwa-installable', handleInstallable);
     
-    // Verificação secundária
     const interval = setInterval(() => {
       if (window.deferredPrompt && !canInstall) setCanInstall(true);
     }, 2000);
@@ -60,8 +61,6 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
     window.deferredPrompt = null;
     setCanInstall(false);
   };
-
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
 
   return (
     <div className="flex flex-col h-full animate-in slide-in-from-right-6 duration-500 overflow-y-auto pb-10 pr-1 scrollbar-hide">
@@ -98,13 +97,50 @@ const SettingsSection: React.FC<Props> = ({ settings, trashCount, historyCount, 
           </div>
         )}
 
-        {isStandalone && (
-          <div className="px-6 py-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-3xl">
-            <p className="text-[10px] text-green-700 dark:text-green-400 font-black uppercase tracking-widest text-center">
-              ✓ Aplicativo Instalado
-            </p>
+        {isIOS && !isStandalone && (
+          <div className="space-y-4">
+             <label className="block text-[11px] uppercase tracking-[0.3em] px-6 font-black text-[#A17A74] dark:text-[#D4A5A5]">
+              Instalar no iPhone
+            </label>
+            <div className="p-6 bg-white dark:bg-white/5 border-2 border-dashed border-[#A17A74]/30 rounded-[2.5rem] text-center">
+              <p className="text-xs font-medium text-[#3D3434] dark:text-white leading-relaxed">
+                Toque no ícone de <span className="inline-block bg-blue-500 text-white p-1 rounded">Compartilhar</span> abaixo e escolha <br/>
+                <span className="font-black uppercase tracking-widest text-[10px]">"Adicionar à Tela de Início"</span>
+              </p>
+            </div>
           </div>
         )}
+
+        {/* Alterar Dias da Contagem */}
+        <div className="space-y-4">
+          <label className="block text-[11px] uppercase tracking-[0.3em] px-6 font-black text-[#A17A74] dark:text-[#D4A5A5]">
+            Nossa Contagem
+          </label>
+          <div className="bg-white/60 dark:bg-white/10 backdrop-blur-md p-8 rounded-[2.5rem] border-2 border-white/20 shadow-lg">
+             <div className="flex flex-col gap-5">
+                <div className="flex justify-between items-center px-1">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-black text-[#3D3434] dark:text-white">Data do Encontro</span>
+                    <span className="text-[10px] uppercase tracking-widest text-[#A17A74] font-black opacity-60">Sincronizado entre aparelhos</span>
+                  </div>
+                  <div className="w-10 h-10 bg-[#A17A74]/10 rounded-xl flex items-center justify-center text-[#A17A74]">
+                    <CalendarIcon />
+                  </div>
+                </div>
+                <input 
+                  type="date" 
+                  value={settings.targetDate}
+                  onChange={(e) => onUpdate({ targetDate: e.target.value })}
+                  className="w-full p-5 bg-white dark:bg-black/20 border-2 border-[#A17A74]/30 rounded-2xl outline-none font-black text-[#3D3434] dark:text-white focus:border-[#A17A74] transition-all shadow-sm"
+                />
+                <div className="px-4 py-3 bg-[#A17A74]/5 rounded-2xl">
+                  <p className="text-[9px] text-[#A17A74] font-black uppercase tracking-[0.1em] text-center leading-relaxed">
+                    A contagem na tela inicial será ajustada automaticamente para {settings.targetDate.split('-').reverse().join('/')}.
+                  </p>
+                </div>
+             </div>
+          </div>
+        </div>
 
         <div className="space-y-4">
           <label className="block text-[11px] uppercase tracking-[0.3em] px-6 font-black text-[#A17A74] dark:text-[#D4A5A5]">

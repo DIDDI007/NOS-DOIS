@@ -1,20 +1,21 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
 // Log de versão para debug no console do navegador
-console.log("Versão PWA: 1.0.7 - Ready for Install");
+console.log("Versão PWA: 1.1.0 - Robust SW Register");
 
-// Registro do Service Worker
+// Registro do Service Worker de forma mais segura para evitar erros de origem
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    // Tenta registrar o SW usando o caminho relativo direto ao host atual
+    const swPath = 'sw.js'; 
+    navigator.serviceWorker.register(swPath)
       .then(registration => {
-        console.log('SW registrado com sucesso:', registration.scope);
+        console.log('SW registrado com sucesso no escopo:', registration.scope);
       })
       .catch(err => {
-        console.error('Falha ao registrar SW:', err);
+        console.warn('Falha ao registrar SW (Pode ser esperado em ambientes de preview):', err.message);
       });
   });
 }
@@ -22,11 +23,8 @@ if ('serviceWorker' in navigator) {
 // Lógica de Instalação PWA
 window.addEventListener('beforeinstallprompt', (e) => {
   console.log('Evento beforeinstallprompt disparado!');
-  // Impede que o navegador mostre o prompt automático
   e.preventDefault();
-  // Armazena o evento globalmente para uso posterior
   window.deferredPrompt = e;
-  // Notifica o app que a instalação está disponível
   window.dispatchEvent(new CustomEvent('pwa-installable', { detail: true }));
 });
 
